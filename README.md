@@ -8,4 +8,4 @@
 edit autoexec.bat
 ```
 
-https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
+참조 -> https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
