@@ -1,4 +1,4 @@
-# 제품 판매 웹페이지 (Vue.js, node.s, mariaDB, bootstrap)
+# 제품 판매 웹페이지 (Vue.js, node.js, mariaDB, bootstrap)
 > vue.js 로 구현한 간단한 제품판매 웹페이지 입니다
 
 
