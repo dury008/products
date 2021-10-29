@@ -8,6 +8,4 @@
 edit autoexec.bat
 ```
 
-
-
-[개발자의 품격 유튜브]: https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
+https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
