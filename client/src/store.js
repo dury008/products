@@ -1,5 +1,5 @@
 import {createStore} from 'vuex'
-
+import persistedstate from 'vuex-persistedstate'
 
 const store = createStore({
     state() {
@@ -7,6 +7,9 @@ const store = createStore({
             user: {}
         }
     },
+    plugins: [
+        persistedstate({paths:['user']})
+    ],
     mutations: {
         user(state, data) {
             state.user = data;

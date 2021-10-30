@@ -2,29 +2,20 @@
 <div>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-      <a class="navbar-brand" href="#">Soldout</a>
+      <a class="navbar-brand" href="/">Soldout</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-              <router-link class="nav-link" aria-current="page" to="/">홈</router-link>
-          </li>
-          <li class="nav-item">
-              <router-link class="nav-link active" to="/">제품리스트</router-link>
-          </li>
-          <li class="nav-item">
-              <router-link class="nav-link" to="detail">제품상세페이지</router-link>
-          </li>
-          <li class="nav-item">
-              <router-link class="nav-link" to="/create">제품등록페이지</router-link>
-          </li>
-          <li><a id="custom-login-btn" @click="kakaoLogin()"><img
-                src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
-                width="222"/>
-            </a>
-          </li>
+            <li class="nav-item">
+                <router-link class="nav-link" aria-current="page" to="/">홈</router-link>
+            </li>
+            <li v-if="user.email!=undefined" class="nav-item">
+                <router-link class="nav-link" to="/sales">제품등록</router-link>
+            </li>
+            <li v-if="user.email==undefined"><a id="custom-login-btn" @click="kakaoLogin()"><img src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg" width="180"/></a></li>
+            <li v-else><button class="btn btn-danger" type="button" @click="kakaoLogout()">로그아웃</button>` `<span class="text-white">{{user.profile.nickname}}님</span></li>
           </ul>
           <form class="d-flex">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -84,6 +75,11 @@
 </template>
 <script>
 export default {
+    computed: {
+        user() {
+            return this.$store.state.user;
+        }
+    },
     methods: {
         kakaoLogin() {
             window.Kakao.Auth.login({
@@ -97,7 +93,7 @@ export default {
                 success: (res) => {
                     const kakao_account = res.kakao_account;
                     this.login(kakao_account);
-                    alert("로그인 성공");
+                    this.$swal("로그인성공");
                 }
             });
         },
@@ -111,7 +107,7 @@ export default {
                 console.log("access token:", window.Kakao.Auth.getAccessToken());
                 console.log("log out:", response);
                 this.$store.commit("user", {})
-                alert("로그아웃")
+                this.$swal("로그아웃");
             });
         },
         async login(kakao_account) {
