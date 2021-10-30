@@ -45,9 +45,21 @@ const dbPool = require('mysql').createPool(db);
 
 
 app.post('/api/login', async (request, res) => {
-    request.session['email'] = "dury008@naver.com";
-    console.log(request.session);
-    res.send('ok');
+    try {
+        await req.db('singUp', request.body.param);
+        if(request.body.param.length > 0){
+            for(let key in request.body.param[0]){
+                request.session[key] = request.body.param[0][key];
+            }
+            res.send(request.body.param[0]);
+            console.log(request.session);
+        }
+        else{
+            res.send({error:"please try again or contact system manager"})
+        }
+    }catch(err){
+        res.send({error: "db access error"});
+    }
 });
 
 app.post('/api/logout', async (request, res) => {

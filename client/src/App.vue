@@ -20,10 +20,15 @@
           <li class="nav-item">
               <router-link class="nav-link" to="/create">제품등록페이지</router-link>
           </li>
+          <li><a id="custom-login-btn" @click="kakaoLogin()"><img
+                src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
+                width="222"/>
+            </a>
+          </li>
           </ul>
           <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
       </div>
       </div>
@@ -77,7 +82,51 @@
   </footer>
 </div>
 </template>
+<script>
+export default {
+    methods: {
+        kakaoLogin() {
+            window.Kakao.Auth.login({
+            scope: "profile_nickname, account_email",
+            success: this.getKakaoAccount,
+        });
+        },
+        getKakaoAccount() {
+            window.Kakao.API.request({
+                url: "/v2/user/me",
+                success: (res) => {
+                    const kakao_account = res.kakao_account;
+                    this.login(kakao_account);
+                    alert("로그인 성공");
+                }
+            });
+        },
+        kakaoLogout() {
+            if (!window.Kakao.Auth.getAccessToken()) {
+                console.log("Not logged in.");
+                return;
+            }
+            window.Kakao.Auth.logout((response) => {
+                //로그아웃
+                console.log("access token:", window.Kakao.Auth.getAccessToken());
+                console.log("log out:", response);
+                this.$store.commit("user", {})
+                alert("로그아웃")
+            });
+        },
+        async login(kakao_account) {
+            await this.$api("/api/login", {
+                param: [
+                    {email:kakao_account.email, nickname: kakao_account.profile.nickname},
+                    {nickname: kakao_account.profile.nickname}
+                ]
+            });
 
+            this.$store.commit("user", kakao_account);
+        }
+    },
+}
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

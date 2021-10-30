@@ -19,6 +19,9 @@ module.exports = {
     productImageInsert: {
         query: `INSERT INTO t_image (product_id, type, path)
         values (?,?,?)`
+    },
+    singUp: {
+        query: `insert into t_user set ? on duplicate key update ?`
     }
 
 }
