@@ -1,6 +1,6 @@
 # 제품 판매 웹페이지 (Vue.js, node.js, mariaDB, bootstrap)
 > vue.js 로 구현한 간단한 제품판매 웹페이지 입니다
-
+![product](https://user-images.githubusercontent.com/22339142/139576031-58eb06b4-c596-49cb-a226-329ab04296b0.png)
 
 ## 설치 방법
 1. mariadb설치후 dev 데이터베이스 생성
