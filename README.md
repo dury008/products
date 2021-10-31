@@ -108,4 +108,5 @@ const db = {
 5. /client 에서 npm install -> npm run serve
 
 ec2배포 ->  http://ec2-3-37-189-231.ap-northeast-2.compute.amazonaws.com:8080
-참조 -> https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
+### 참조 
+-> https://www.youtube.com/watch?v=J2lLkpc79n0&list=PLqbWuGdVBJd1TzOA-ozYSlYRQio1F5t02
