@@ -82,6 +82,50 @@ app.post('/api/:alias', async (request, res) => {
     }
 });
 
+app.post('/upload/:productId/:type/:fileName', async (request, res) => {
+    let {
+        productId,
+        type,
+        fileName
+    } = request.params;
+    const dir = `${__dirname}/uploads/${productId}`;
+    const file = `${dir}/${fileName}`;
+    if(!request.body.data) return fs.unlink(file, async (err) => res.send({ 
+        err 
+    }));
+    const data = request.body.data.slice(request.body.data.indexOf(';base64,') + 8);
+    if(!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFile(file, data, 'base64', async (error) => {
+        await req.db('productImageInsert', [{
+            product_id: productId,
+            type: type,
+            path: fileName
+        }]);
+
+        if(error) {
+            res.send({
+                error
+            });
+        } else {
+            res.send("ok");
+        }
+    });
+});
+
+app.get('/download/:productId/:fileName', (request, res) => {
+    const {
+        productId,
+        fileName
+    } = request.params;
+
+    const filepath = `${__dirname}/uploads/${productId}/${fileName}`;
+    res.header('Content-Type', `image/${fileName.substring(fileName.lastIndexOf("."))}`);
+    if(!fs.existsSync(filepath)) res.send(404, {
+        error: 'Can not found file'
+    });
+    else fs.createReadStream(filepath).pipe(res);
+});
+
 const req = {
     async db(alias, param = [], where = '') {
       return new Promise((resolve, reject) => dbPool.query(sql[alias].query + where, param, (error, rows) => {

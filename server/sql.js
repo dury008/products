@@ -15,6 +15,13 @@ module.exports = {
         FROM t_product t1, t_image t2, t_category t3
         WHERE t1.id = ? AND t1.id = t2.product_id AND t2.type = 3 AND t1.category_id = t3.id`
     },
+
+    productDetailnoImage: {
+        query: `SELECT t1.*, t2.category1, t2.category2, t2.category3  
+        FROM t_product t1, t_category t2
+        WHERE t1.id = ? AND t1.category_id = t2.id`
+    },
+
     productMainImage: {
         query: `SELECT * FROM t_image WHERE product_id = ? AND type = 2`
     },
@@ -22,8 +29,7 @@ module.exports = {
         query: `INSERT INTO t_product set ?`
     },
     productImageInsert: {
-        query: `INSERT INTO t_image (product_id, type, path)
-        values (?,?,?)`
+        query: `INSERT INTO t_image set ?`
     },
     singUp: {
         query: `insert into t_user set ? on duplicate key update ?`
@@ -33,5 +39,15 @@ module.exports = {
     },
     categoryList: {
         query: `select * from t_category`
+    },
+    imageList: {
+        query: `select * from t_image where product_id=?`
+    },
+    imageDelete: {
+        query: `delete from t_image where id=?`
+      },
+    deleteImage: {
+        query: `delete from t_image where product_id=? and type=?`
     }
+
 }

@@ -17,7 +17,15 @@
             <div class="mb-3 row">
                 <label class="col-md-3 col-form-label">썸네일이미지</label>
                 <div class="col-md-9">
-                    <input class="form-control" type="file" accept="image/png, image/jpeg">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-4 col-sm-2" :key="i" v-for="(m,i) in productImage.filter(c=>c.type==1)">
+                            <div class="position-relative">
+                                <img :src="`/download/${productId}/${m.path}`" class="img-fluid" />
+                                <div class="position-absolute top-0 end-0" style="cursor:pointer;" @click="deleteImage(m.id)">X</div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <input class="form-control" type="file" accept="image/png, image/jpeg" @change="uploadFile($event.target.files, 1)">
                     <div class="alert alert-secondary" role="alert">
                         <ul>
                             <li>이미지 사이즈 : 350*350</li>
@@ -30,7 +38,15 @@
             <div class="mb-3 row">
                 <label class="col-md-3 col-form-label">제품이미지</label>
                 <div class="col-md-9">
-                    <input class="form-control" type="file" accept="image/png, image/jpeg" multiple>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-4 col-sm-2" :key="i" v-for="(m,i) in productImage.filter(c=>c.type==2)">
+                            <div class="position-relative">
+                                <img :src="`/download/${productId}/${m.path}`" class="img-fluid" />
+                                <div class="position-absolute top-0 end-0" style="cursor:pointer;" @click="deleteImage(m.id)">X</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" type="file" accept="image/png, image/jpeg"  @change="uploadFile($event.target.files, 2)">
                     <div class="alert alert-secondary" role="alert">
                         <ul>
                             <li>최대 5개 가능</li>
@@ -44,7 +60,13 @@
             <div class="mb-3 row">
                 <label class="col-md-3 col-form-label">제품설명이미지</label>
                 <div class="col-md-9">
-                    <input class="form-control" type="file" accept="image/png, image/jpeg">
+                    <div class="col-lg-3 col-md-4 col-sm-2" :key="i" v-for="(m,i) in productImage.filter(c=>c.type==3)">
+                        <div class="position-relative">
+                            <img :src="`/download/${productId}/${m.path}`" class="img-fluid" />
+                            <div class="position-absolute top-0 end-0" style="cursor:pointer;" @click="deleteImage(m.id)">X</div>
+                        </div>
+                    </div>
+                    <input class="form-control" type="file" accept="image/png, image/jpeg" @change="uploadFile($event.target.files, 3)">
                     <div class="alert alert-secondary" role="alert">
                         <ul>
                             <li>파일 사이즈 : 5M 이하</li>
@@ -54,12 +76,10 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <div class="col-6 d-grid p-1">
-                    <button type="button" class="btn btn-lg btn-dark" @click="goTosales">취소하기</button>
+                <div class="col-4 d-grid p-1">
+                    <button type="button" class="btn btn-lg btn-dark" @click="goTosales">뒤로</button>
                 </div>
-                <div class="col-6 d-grid p-1">
-                    <button type="button" class="btn btn-lg btn-danger">저장하기</button>
-                </div>
+                
             </div>
         </div>
     </main>
@@ -98,15 +118,55 @@ export default {
             this.$router.push({path:'/sales'});
         },
         async getProductDetail(){
-            let productDetail = await this.$api("/api/productDetail",{param: [this.productId]});
+            let productDetail = await this.$api("/api/productDetailnoImage",{param: [this.productId]});
             if(productDetail.length > 0){
                 this.productDetail = productDetail[0];
             }
             console.log(this.productDetail);
         },
         async getProductImage(){
-            this.productImage = await this.$api("/api/productMainImage",{param: [this.productId]});
+            this.productImage = await this.$api("/api/imageList",{param: [this.productId]});
             console.log(this.productImage)
+        },
+        async uploadFile(files, type) {
+            if(type == 1 || type == 3){
+                await this.$api("/api/deleteImage", {param: [this.productId, type]});
+            } else{
+                if(this.productImage.filter(c=>c.type==2).length == 3){
+                    return this.$swal("제품이미지는 3개까지만 등록가능합니다.")
+                }
+            }
+
+            let name = "";
+            let data = null;
+            if(files) {
+                name = files[0].name;
+                data = await this.$base64(files[0]);
+            }
+            const { error } = await this.$api(`/upload/${this.productId}/${type}/${name}`, { data })
+            if(error) {
+                return this.$swal("이미지 업로드에 실패하였습니다.");
+            }
+
+            this.$swal("이미지가 업로드 되었습니다.");
+
+            setTimeout(() => {
+                this.getProductImage();
+            }, 1000);
+        },
+        deleteImage(id) {
+            this.$swal.fire({
+                title: '정말 삭제 하시겠습니까?',
+                showCancelButton: true,
+                confirmButtonText: `삭제`,
+                cancelButtonText: `취소`
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                await this.$api("/api/imageDelete",{param:[id]});
+                this.getProductImage();
+                this.$swal.fire('삭제되었습니다!', '', 'success');
+                } 
+            });
         },
     }
 }
