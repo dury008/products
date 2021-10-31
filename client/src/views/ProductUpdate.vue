@@ -40,18 +40,18 @@
                 <div class="col-md-9">
                     <div class="row">
                         <div class="col-auto">
-                            <select class="form-select">
-                                <option>전자제품</option>
+                            <select class="form-select" @change="changeCategory1" v-model="cate1">
+                                <option :value="cate" :key="i" v-for="(cate,i) in category1">{{cate}}</option>
                             </select>
                         </div>
                         <div class="col-auto">
-                            <select class="form-select">
-                                <option>컴퓨터</option>
+                            <select class="form-select" @change="changeCategory2" v-model="cate2">
+                                <option :value="cate" :key="i" v-for="(cate,i) in category2">{{cate}}</option>
                             </select>
                         </div>
                         <div class="col-auto">
-                            <select class="form-select">
-                                <option>악세사리</option>
+                            <select class="form-select" v-model="cate3">
+                                <option :value="cate" :key="i" v-for="(cate,i) in category3">{{cate}}</option>
                             </select>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                     <button type="button" class="btn btn-lg btn-dark" @click="goTosales">취소하기</button>
                 </div>
                 <div class="col-6 d-grid p-1">
-                    <button type="button" class="btn btn-lg btn-danger">저장하기</button>
+                    <button type="button" class="btn btn-lg btn-danger" @click="productUpdate">수정하기</button>
                 </div>
             </div>
         </div>
@@ -92,6 +92,14 @@ export default {
         return {
             productId: 0,
             productDetail: {},
+
+            categoryList: [],
+            category1:[],
+            category2:[],
+            category3:[],
+            cate1: "",
+            cate2: "",
+            cate3: ""
         };
     },
     computed: {
@@ -103,6 +111,7 @@ export default {
     created() {
         this.productId = this.$route.query.product_id;
         this.getProductDetail();
+        this.getCategoryList();
     },
     mounted() {
         if(this.user.email == undefined) {
@@ -121,6 +130,102 @@ export default {
                 this.productDetail = productDetail[0];
             }
             console.log(this.productDetail);
+        },
+        async getCategoryList() {
+            let categoryList = await this.$api("/api/categoryList",{});
+            this.categoryList = categoryList;
+
+            let oCategory = {};
+            this.categoryList.forEach(item => {
+                oCategory[item.category1] = item.id
+            });
+
+            let category1 = [];
+            for(let key in oCategory){
+                category1.push(key);
+            }
+            this.category1 = category1;
+        },
+        changeCategory1(){
+            this.category3= []
+            let categoryList = this.categoryList.filter(c=> {
+                return c.category1 == this.cate1;
+            })
+
+            let oCategory2 = {};
+            categoryList.forEach(item => {
+                oCategory2[item.category2] = item.id
+            });
+
+            let category2 = [];
+            for(let key in oCategory2){
+                category2.push(key);
+            }
+            this.category2 = category2;
+        },
+        changeCategory2(){
+            let categoryList = this.categoryList.filter(c=> {
+                return (c.category1 == this.cate1 && c.category2 == this.cate2);
+            })
+
+            let oCategory3 = {};
+            categoryList.forEach(item => {
+                oCategory3[item.category3] = item.id;
+            });
+
+            let category3 = [];
+            for(let key in oCategory3){
+                category3.push(key);
+            }
+            this.category3 = category3;
+        },
+        productUpdate() {
+            if(this.productDetail.product_name =="") {
+                return this.$swal("제품명은 필수 입력값입니다.")
+            }
+
+            if(this.productDetail.product_price == "" || this.productDetail.product_price == 0) {
+                return this.$swal("제품 가격을 입력하세요")
+            }
+
+            if(this.productDetail.delivery_price == "" || this.productDetail.delivery_price == 0) {
+                return this.$swal("배송료를 입력하세요")
+            }
+
+            if(this.productDetail.outbound_days == "" || this.productDetail.outbound_days == 0) {
+                return this.$swal("출고일을 입력하세요")
+            }
+            if(this.cate1 == "" || this.cate2 == "" || this.cate3 == "") {
+                return this.$swal("카테고리를 선택하세요")
+            }
+
+            let product = {
+                product_name: this.productDetail.product_name,
+                product_price: this.productDetail.product_price,
+                delivery_price: this.productDetail.delivery_price,
+                add_delivery_price: this.productDetail.add_delivery_price,
+                tags: this.productDetail.tags,
+                outbound_days: this.productDetail.outbound_days,
+                category_id: 1
+            };
+
+            product.category_id = this.categoryList.filter(c => {
+                return (c.category1 == this.cate1 && c.category2 == this.cate2 && c.category3 == this.cate3)
+            })[0].id;
+
+            console.log(product);
+            this.$swal.fire({
+                title: '정말 수정하시겠습니까?',
+                showCancelButton: true,
+                confirmButtonText: '수정',
+                cancelButtonText:`취소`
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await this.$api("/api/productUpdate",{param: [ product, this.productId ]});
+                        this.$swal.fire('수정되었습니다', '', 'success');
+                        this.$router.push({path:'/sales'});
+                    }
+                });
         },
     }
 }

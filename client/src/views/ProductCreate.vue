@@ -145,6 +145,9 @@ export default {
             if(this.product.outbound_days == "" || this.product.outbound_days == 0) {
                 return this.$swal("배송료를 입력하세요")
             }
+            if(this.cate1 == "" || this.cate2 == "" || this.cate3 == "") {
+                return this.$swal("카테고리를 선택하세요")
+            }
 
             this.product.category_id = this.categoryList.filter(c => {
                 return (c.category1 == this.cate1 && c.category2 == this.cate2 && c.category3 == this.cate3)

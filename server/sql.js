@@ -48,6 +48,9 @@ module.exports = {
       },
     deleteImage: {
         query: `delete from t_image where product_id=? and type=?`
+    },
+    productUpdate: {
+        query: `update t_product set ? where id=?`
     }
 
 }
