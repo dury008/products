@@ -36,9 +36,9 @@ fs.watchFile(__dirname + '/sql.js', (curr, prev) => {
 const db = {
     database: "dev",
     connectionLimit: 10,
-    host: "localhost",
-    user: "root",
-    password: "wlsgur1020"
+    host: "host",//db 호스트주소 디폴트 3306
+    user: "user",//db id
+    password: "password"//db password
 };
 
 const dbPool = require('mysql').createPool(db);
